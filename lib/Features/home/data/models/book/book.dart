@@ -1,8 +1,10 @@
+import 'package:booklycleanarch/Features/home/domain/entities/book_entity.dart';
+
 import 'access_info.dart';
 import 'sale_info.dart';
 import 'volume_info.dart';
 
-class Book {
+class BookModel extends BookEntity {
   String? kind;
   String? id;
   String? etag;
@@ -11,7 +13,7 @@ class Book {
   SaleInfo? saleInfo;
   AccessInfo? accessInfo;
 
-  Book({
+  BookModel({
     this.kind,
     this.id,
     this.etag,
@@ -19,9 +21,16 @@ class Book {
     this.volumeInfo,
     this.saleInfo,
     this.accessInfo,
-  });
+  }) : super(
+         bookId: id!,
+         image: volumeInfo?.imageLinks?.thumbnail,
+         title: '',
+         authorName: volumeInfo?.authors?.first,
+         price: 0.0,
+         rating: 0.0,
+       );
 
-  factory Book.fromJson(Map<String, dynamic> json) => Book(
+  factory BookModel.fromJson(Map<String, dynamic> json) => BookModel(
     kind: json['kind'] as String?,
     id: json['id'] as String?,
     etag: json['etag'] as String?,
@@ -39,7 +48,7 @@ class Book {
 
   Map<String, dynamic> toJson() => {
     'kind': kind,
-    'id': id,
+    'id': bookId,
     'etag': etag,
     'selfLink': selfLink,
     'volumeInfo': volumeInfo?.toJson(),
