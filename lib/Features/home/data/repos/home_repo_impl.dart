@@ -4,6 +4,7 @@ import 'package:booklycleanarch/Features/home/domain/entities/book_entity.dart';
 import 'package:booklycleanarch/Features/home/domain/repos/home_repo.dart';
 import 'package:booklycleanarch/core/errors/failure.dart';
 import 'package:dartz/dartz.dart';
+import 'package:dio/dio.dart';
 
 class HomeRepoImpl extends HomeRepo {
   final HomeRemoteDataSource homeRemoteDataSource;
@@ -16,29 +17,41 @@ class HomeRepoImpl extends HomeRepo {
   Future<Either<Failure, List<BookEntity>>> fetchFeaturedBooks() async {
     try {
       // get books from cache first for best performance and better UX
-      var booksList = homeLocalDataSource.fetchFeaturedBooks();
-      if (booksList.isNotEmpty) return Right(booksList);
+      List<BookEntity> books;
+
+      books = homeLocalDataSource.fetchFeaturedBooks();
+      if (books.isNotEmpty) return Right(books);
 
       // if the cache is empty, get books from the server
-      var books = await homeRemoteDataSource.fetchFeaturedBooks();
+      books = await homeRemoteDataSource.fetchFeaturedBooks();
       return Right(books);
-    } on Exception catch (e) {
-      return Left(Failure());
+    } catch (e) {
+      if (e is DioException) {
+        return Left(ServerFailure.fromDioError(e));
+      }
+      return Left(ServerFailure(message: e.toString()));
     }
   }
+
+  ///////////////////////////////////////////////////////////
 
   @override
   Future<Either<Failure, List<BookEntity>>> fetchNewestBooks() async {
     try {
+      List<BookEntity> books;
       // get books from cache first for best performance and better UX
-      var booksList = homeLocalDataSource.fetchNewestBooks();
-      if (booksList.isNotEmpty) return Right(booksList);
+      books = homeLocalDataSource.fetchNewestBooks();
+      if (books.isNotEmpty) return Right(books);
 
       // if the cache is empty, get books from the server
-      var books = await homeRemoteDataSource.fetchNewestBooks();
+      books = await homeRemoteDataSource.fetchNewestBooks();
       return Right(books);
-    } on Exception catch (e) {
-      return Left(Failure());
+    } catch (e) {
+      //cause dio handles the exceptions about the server
+      if (e is DioException) {
+        return Left(ServerFailure.fromDioError(e));
+      }
+      return Left(ServerFailure(message: e.toString()));
     }
   }
 }
