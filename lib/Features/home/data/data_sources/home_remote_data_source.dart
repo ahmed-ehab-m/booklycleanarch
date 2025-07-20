@@ -1,6 +1,8 @@
 import 'package:booklycleanarch/Features/home/data/models/book/book.dart';
 import 'package:booklycleanarch/Features/home/domain/entities/book_entity.dart';
+import 'package:booklycleanarch/constants.dart';
 import 'package:booklycleanarch/core/utils/api_service.dart';
+import 'package:booklycleanarch/core/utils/functions/saveBooks.dart';
 
 abstract class HomeRemoteDataSource {
   Future<List<BookEntity>> fetchNewestBooks();
@@ -17,6 +19,8 @@ class HomeRemoteDataSourceImpl extends HomeRemoteDataSource {
       endPoint: 'volumes?Filtering=free-ebooks&q=programming',
     );
     List<BookEntity> books = getBooksList(data);
+    // cache the books
+    saveBooks(books, kFeaturedBox);
     return books;
   }
 
