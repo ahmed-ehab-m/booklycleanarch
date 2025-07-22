@@ -6,7 +6,7 @@ import 'package:booklycleanarch/core/utils/functions/saveBooks.dart';
 
 abstract class HomeRemoteDataSource {
   Future<List<BookEntity>> fetchNewestBooks();
-  Future<List<BookEntity>> fetchFeaturedBooks();
+  Future<List<BookEntity>> fetchFeaturedBooks({int pageNumber = 0});
 }
 
 class HomeRemoteDataSourceImpl extends HomeRemoteDataSource {
@@ -14,9 +14,10 @@ class HomeRemoteDataSourceImpl extends HomeRemoteDataSource {
   HomeRemoteDataSourceImpl(this._apiService);
   ////////////////////////////////////////////
   @override
-  Future<List<BookEntity>> fetchFeaturedBooks() async {
+  Future<List<BookEntity>> fetchFeaturedBooks({int pageNumber = 0}) async {
     var data = await _apiService.get(
-      endPoint: 'volumes?Filtering=free-ebooks&q=programming',
+      endPoint:
+          'volumes?Filtering=free-ebooks&q=programming&startIndex=${pageNumber * 10}', // * 10 because each page has 10 books
     );
     List<BookEntity> books = getBooksList(data);
     // cache the books

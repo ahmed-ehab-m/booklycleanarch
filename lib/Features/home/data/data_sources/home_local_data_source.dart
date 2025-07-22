@@ -4,15 +4,25 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 abstract class HomeLocalDataSource {
   List<BookEntity> fetchNewestBooks();
-  List<BookEntity> fetchFeaturedBooks();
+  List<BookEntity> fetchFeaturedBooks({int pageNumber = 0});
 }
 ////////////////////////////////////////////////////////
 
 class HomeLocalDataSourceImpl extends HomeLocalDataSource {
   @override
-  List<BookEntity> fetchFeaturedBooks() {
+  List<BookEntity> fetchFeaturedBooks({int pageNumber = 0}) {
     var box = Hive.box<BookEntity>(kFeaturedBox);
-    return box.values.toList();
+    int length = box.values.length; // Get the total number of books in the box
+    int startIndex = pageNumber * 10;
+    int endIndex = (pageNumber + 1) * 10; // not included in the result
+    // Ensure the indices are within bounds
+    // if not in range, return an empty list to fetch new page
+    // from the api in remote data source
+    // the number of books in last page may be less than 10
+    // this cause an error if we try to access out of range
+    if (startIndex >= length || endIndex > length) return [];
+
+    return box.values.toList().sublist(startIndex, endIndex);
   }
 
   ////////////////////////////////////////////////////////

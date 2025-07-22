@@ -7,6 +7,16 @@ final class FetchFeaturedBooksInitial extends FetchFeaturedBooksState {}
 
 final class FetchFeaturedBooksLoading extends FetchFeaturedBooksState {}
 
+final class FetchFeaturedBooksPaginationLoading
+    extends FetchFeaturedBooksState {}
+
+final class FetchFeaturedBooksPaginationFailure
+    extends FetchFeaturedBooksState {
+  final String errorMessage;
+
+  FetchFeaturedBooksPaginationFailure(this.errorMessage);
+}
+
 final class FetchFeaturedBooksSuccess extends FetchFeaturedBooksState {
   final List<BookEntity> books;
 
